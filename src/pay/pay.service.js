@@ -5,7 +5,6 @@ export const processPayment = async (orderId, amount) => {
         throw new Error('Order ID and amount are required');
     }
 
-    // Additional business logic or validation can be done here if needed
     try {
         const transactionToken = await createTransactionToken(orderId, amount);
         return transactionToken;
