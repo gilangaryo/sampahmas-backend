@@ -21,17 +21,3 @@ export function setupMQTT() {
         handleMQTTMessage(receivedTopic, message);
     });
 }
-
-
-
-export function publishResetCommand(deviceId) {
-    const resetTopic = `vending/${deviceId}/reset`;
-
-    mqttClient.publish(resetTopic, JSON.stringify({ message: 'reset' }), { qos: 1 }, (err) => {
-        if (err) {
-            console.error('Failed to publish reset command to MQTT:', err);
-        } else {
-            console.log(`Published reset command to MQTT topic '${resetTopic}'`);
-        }
-    });
-}

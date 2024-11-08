@@ -1,5 +1,5 @@
 import mqttClient from './mqttClient.js';
-import { handleRFIDAuthentication, handlePointData } from '../helper/iotHandler.js';
+import { handleRFIDAuthentication, handlePointData, publishResetCommand } from '../helper/iotHandler.js';
 import { clientSubscriptions } from './mqtt.controller.js';
 
 export async function handleMQTTMessage(topic, message) {
@@ -8,7 +8,7 @@ export async function handleMQTTMessage(topic, message) {
 
     let data;
     try {
-        data = JSON.parse(payloadString);
+        data = JSON.parse(payloadString); 
     } catch (error) {
         console.error('Failed to parse message payload:', error);
         return;
@@ -19,42 +19,54 @@ export async function handleMQTTMessage(topic, message) {
         const deviceId = topicParts[1];
         const action = topicParts[2];
 
-        if (action === 'auth') {
-            const result = await handleRFIDAuthentication(deviceId, data);
-            const responseTopic = `vending/${deviceId}/authResult`;
+        switch (action) {
+            case 'auth':
+                const authResult = await handleRFIDAuthentication(deviceId, data);
+                const authResponseTopic = `vending/${deviceId}/authResult`;
 
-            mqttClient.publish(responseTopic, JSON.stringify(result), { qos: 2 }, (error) => {
-                if (error) {
-                    console.error(`Failed to publish authResult to ${responseTopic}:`, error);
+                mqttClient.publish(authResponseTopic, JSON.stringify(authResult), { qos: 2 }, (error) => {
+                    if (error) {
+                        console.error(`Failed to publish authResult to ${authResponseTopic}:`, error);
+                    } else {
+                        console.log(`Successfully published authResult to ${authResponseTopic}`);
+                    }
+                });
+
+                const authClient = clientSubscriptions[deviceId];
+                if (authClient && authClient.readyState === authClient.OPEN) {
+                    authClient.send(JSON.stringify(authResult));
                 } else {
-                    console.log(`Successfully published authResult to ${responseTopic}`);
+                    console.warn(`No WebSocket client connected for device ${deviceId}`);
                 }
-            });
+                break;
 
-            const client = clientSubscriptions[deviceId];
-            if (client && client.readyState === client.OPEN) {
-                client.send(JSON.stringify(result));
-            } else {
-                console.warn(`No WebSocket client connected for device ${deviceId}`);
-            }
-        } else if (action === 'point') {
-            const result = await handlePointData(deviceId, data);
-            const responseTopic = `vending/${deviceId}/pointResult`;
+            case 'point':
+                const pointResult = await handlePointData(deviceId, data);
+                const pointResponseTopic = `vending/${deviceId}/pointResult`;
 
-            mqttClient.publish(responseTopic, JSON.stringify(result), { qos: 2 }, (error) => {
-                if (error) {
-                    console.error(`Failed to publish pointResult to ${responseTopic}:`, error);
+                mqttClient.publish(pointResponseTopic, JSON.stringify(pointResult), { qos: 2 }, (error) => {
+                    if (error) {
+                        console.error(`Failed to publish pointResult to ${pointResponseTopic}:`, error);
+                    } else {
+                        console.log(`Successfully published pointResult to ${pointResponseTopic}`);
+                    }
+                });
+
+                const pointClient = clientSubscriptions[deviceId];
+                if (pointClient && pointClient.readyState === pointClient.OPEN) {
+                    pointClient.send(JSON.stringify(pointResult));
                 } else {
-                    console.log(`Successfully published pointResult to ${responseTopic}`);
+                    console.warn(`No WebSocket client connected for device ${deviceId}`);
                 }
-            });
+                break;
 
-            const client = clientSubscriptions[deviceId];
-            if (client && client.readyState === client.OPEN) {
-                client.send(JSON.stringify(result));
-            } else {
-                console.warn(`No WebSocket client connected for device ${deviceId}`);
-            }
+            case 'reset':
+                publishResetCommand(deviceId);
+                console.log(`Handled reset command for device ${deviceId}`);
+                break;
+
+            default:
+                console.warn("Unknown action:", action);
         }
     } else {
         console.warn(`Received message on unexpected topic format: ${topic}`);

@@ -1,4 +1,5 @@
-import { clientSubscriptions, publishResetCommand } from '../mqtt/mqtt.controller.js';
+import { clientSubscriptions } from '../mqtt/mqtt.controller.js';
+import {  publishResetCommand } from '../helper/iotHandler.js';
 import { handleQRCodeAuthentication, updatePointUser } from './websocket.service.js';
 
 export function handleWebSocketConnection(ws) {

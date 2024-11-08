@@ -1,12 +1,10 @@
+// pay.route.js
 import express from 'express';
-// import { createPayment } from '../pay/pay.controller.js';
+import { createPayment, handleNotification } from '../pay/pay.controller.js';
 
 const router = express.Router();
 
-// // Test route
-router.get('/', (req, res) => {
-    res.send('API is running');
-});
-// router.post('/', createPayment);
+router.post('/create-payment', createPayment);
+router.post('/notification', handleNotification);
 
 export default router;

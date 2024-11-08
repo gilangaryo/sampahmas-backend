@@ -32,19 +32,13 @@ class AuthService {
 
     // Login user
     async loginUser(email, password) {
-        try {
-            const user = await authRepository.login(email, password);
+        const user = await authRepository.login(email, password);
 
+        // Generate JWT tokens
+        const accessToken = this.generateAccessToken(user);
+        const refreshToken = this.generateRefreshToken(user);
 
-            // Generate JWT tokens
-            const accessToken = this.generateAccessToken(user);
-            const refreshToken = this.generateRefreshToken(user);
-
-            return { user, accessToken, refreshToken };
-        } catch (error) {
-            console.error('Error logging in user:', error);
-            throw new Error(error.message);
-        }
+        return { user, accessToken, refreshToken };
     }
 
     // Logout user

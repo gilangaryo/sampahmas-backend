@@ -37,10 +37,10 @@ class AuthController {
                 statusCode: 200,
                 message: 'Login successful',
                 user,
-                firebaseAccessToken,
-                firebaserefreshToken,
-                accessToken,
-                refreshToken
+                // firebaseAccessToken,
+                // firebaserefreshToken,
+                // accessToken,
+                // refreshToken
             });
         } catch (error) {
             console.error('Login Error:', error);

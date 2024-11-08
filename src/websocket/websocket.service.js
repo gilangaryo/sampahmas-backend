@@ -77,13 +77,11 @@ export async function updatePointUser(userId, counter, ws) {
         const pointsToAdd = counter * 100;
         const updatedTotalPoints = currentUser.points + pointsToAdd;
 
-        // Update the user's last counter and points in the database
         await userRepository.updateBottle(userId, botolTerkumpul);
         await userRepository.updatePoints(userId, updatedTotalPoints);
 
         console.log(`User ${userId} points updated to: ${updatedTotalPoints}`);
 
-        // Send a success message back through WebSocket if `ws` is available
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({
                 deviceId: currentUser.deviceId,
@@ -97,7 +95,6 @@ export async function updatePointUser(userId, counter, ws) {
     } catch (error) {
         console.error('Error updating user points:', error);
 
-        // Send an error message if WebSocket is available
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({
                 result: 'Error',

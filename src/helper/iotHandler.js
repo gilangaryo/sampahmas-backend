@@ -44,11 +44,7 @@ export async function handlePointData(deviceId, data) {
         const pointsToAdd = tambahBotol * 100;
         const updatedTotalPoints = currentUser.points + pointsToAdd;
 
-        // Update data user di database
-
-
         console.log('Points updated:', updatedTotalPoints);
-
 
         return {
             deviceId: deviceId,
@@ -65,4 +61,16 @@ export async function handlePointData(deviceId, data) {
             status: false
         };
     }
+}
+
+export async function publishResetCommand(deviceId) {
+    const resetTopic = `vending/${deviceId}/reset`;
+
+    mqttClient.publish(resetTopic, JSON.stringify({ message: 'reset' }), { qos: 2 }, (err) => {
+        if (err) {
+            console.error('Failed to publish reset command to MQTT:', err);
+        } else {
+            console.log(`Published reset command to MQTT topic '${resetTopic}'`);
+        }
+    });
 }
