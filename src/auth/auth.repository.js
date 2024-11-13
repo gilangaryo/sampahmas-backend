@@ -2,21 +2,15 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, si
 import { db } from '../database/databaseAdmin.js'; // Firestore instance for storing user roles
 import { firebaseClientApp } from '../database/databaseClient.js';
 import userRepository from '../users/users.repository.js';
-import { doc, setDoc } from 'firebase/firestore'; // Firestore functions
 
 class AuthRepository {
-    async register(email, password, username, phone, role = 'user') { // Default role is 'user'
+    async register(email, password, username, phone, role = 'user') { 
         const auth = getAuth(firebaseClientApp);
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const uid = userCredential.user.uid;
 
-            // Save user details in Firestore with a role
-            await userRepository.addUser(uid, username, email, phone);
-
-            // Set role information in Firestore
-            const userDoc = doc(db, 'users', uid);
-            await setDoc(userDoc, { role }, { merge: true });
+            await userRepository.addUser(uid, username, email, phone, role);
 
             return userCredential.user;
         } catch (error) {
@@ -41,8 +35,8 @@ class AuthRepository {
     async logout() {
         const auth = getAuth(firebaseClientApp);
         try {
-            await signOut(auth);
-            return true;
+            const result = await signOut(auth);
+            return result;
         } catch (error) {
             console.error('Logout Error:', error);
             throw new Error(error.message);

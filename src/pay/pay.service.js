@@ -8,6 +8,11 @@ const coreApi = new midtransClient.CoreApi({
     clientKey: process.env.MIDTRANS_CLIENT_KEY
 });
 
+const snapApi = new midtransClient.Snap({
+    isProduction: false,
+    serverKey: process.env.MIDTRANS_SERVER_KEY,
+    clientKey: process.env.MIDTRANS_CLIENT_KEY
+});
 export const processPayment = async (orderId, amount) => {
     if (!orderId || !amount) throw new Error('Order ID and amount are required');
 
@@ -21,32 +26,20 @@ export const processPayment = async (orderId, amount) => {
 };
 
 export const processNotification = async (notification) => {
-    const transactionId = notification.transaction_id;
-    const transactionStatus = await coreApi.transaction.status(transactionId);
-
-    const orderId = transactionStatus.order_id;
+    const statusResponse = await snapApi.transaction.notification(notification);
+    const { order_id: orderId, transaction_status: transactionStatus, fraud_status: fraudStatus } = statusResponse;
     let status;
 
-    switch (transactionStatus.transaction_status) {
-        case 'capture':
-            status = transactionStatus.fraud_status === 'accept' ? 'success' : 'failed';
-            break;
-        case 'settlement':
-            status = 'completed';
-            break;
-        case 'pending':
-            status = 'pending';
-            break;
-        case 'deny':
-            status = 'denied';
-            break;
-        case 'expire':
-            status = 'expired';
-            break;
-        case 'cancel':
-            status = 'canceled';
-            break;
+    if (transactionStatus === 'capture') {
+        status = fraudStatus === 'accept' ? 'success' : 'failed';
+    } else if (transactionStatus === 'settlement') {
+        status = 'completed';
+    } else if (transactionStatus === 'pending') {
+        status = 'pending';
+    } else if (['deny', 'expire', 'cancel'].includes(transactionStatus)) {
+        status = 'failed';
     }
+
 
     return await PaymentRepository.updateTransactionStatus(orderId, status);
 };

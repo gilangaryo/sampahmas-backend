@@ -2,12 +2,11 @@
 import userRepository from './users.repository.js';
 
 class UserService {
-    async getAllUsers() {
-        const users = await userRepository.getAllUsers();
-        return users;
-    }
 
     async getUserById(userId) {
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
         const user = await userRepository.getUserById(userId);
         if (!user) {
             throw new Error('User not found');

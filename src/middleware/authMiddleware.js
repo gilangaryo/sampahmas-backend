@@ -1,49 +1,28 @@
-import jwt from 'jsonwebtoken';
+import { getAuth } from "firebase-admin/auth";
 
-const authMiddleware = (req, res, next) => {
+// Middleware to verify Firebase ID Token
+export const authMiddleware = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.split(' ')[1];
+        const idToken = authHeader.split(' ')[1];
 
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = decoded;
+            const decodedToken = await getAuth().verifyIdToken(idToken);
+            req.user = decodedToken; 
             next();
-        } catch (err) {
+        } catch (error) {
+            console.error('Firebase ID token verification failed:', error);
             return res.status(403).json({
                 success: false,
-                message: 'Invalid or expired token',
+                message: 'Invalid or expired Firebase ID token',
             });
         }
     } else {
         return res.status(401).json({
             success: false,
-            message: 'Forbidden credentials',
+            message: 'Forbidden: Firebase ID token missing or malformed',
         });
     }
 };
 
-// Middleware tambahan untuk peran admin
-export const verifyAdmin = (req, res, next) => {
-    if (req.user && req.user.role === 'admin') {
-        return next();
-    }
-    return res.status(403).json({
-        success: false,
-        message: 'Access denied. Admins only.',
-    });
-};
-
-// Middleware tambahan untuk peran user atau admin
-export const verifyUserOrAdmin = (req, res, next) => {
-    if (req.user && (req.user.role === 'user' || req.user.role === 'admin')) {
-        return next();
-    }
-    return res.status(403).json({
-        success: false,
-        message: 'Access denied. User or admin only.',
-    });
-};
-
-export default authMiddleware;

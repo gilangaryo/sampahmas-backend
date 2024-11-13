@@ -1,7 +1,6 @@
 import { db } from '../database/databaseAdmin.js';
 import midtransClient from 'midtrans-client'; // Import without destructuring
 
-// Inisialisasi Snap Client
 const snap = new midtransClient.Snap({
     isProduction: false,
     serverKey: process.env.MIDTRANS_SERVER_KEY,
@@ -9,7 +8,6 @@ const snap = new midtransClient.Snap({
 });
 
 class PaymentRepository {
-    // Membuat transaction token dari Midtrans dan menyimpan transaksi ke database
     async createTransactionToken(orderId, amount) {
         const parameter = {
             transaction_details: {
@@ -21,7 +19,6 @@ class PaymentRepository {
 
         const transaction = await snap.createTransaction(parameter);
 
-        // Simpan transaksi ke Firebase Realtime Database
         const ref = db.ref(`transactions/${orderId}`);
         await ref.set({
             orderId: orderId,

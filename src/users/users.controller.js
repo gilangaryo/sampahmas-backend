@@ -14,10 +14,6 @@ class UserController {
             });
         }
 
-        // Generate tokens
-        const accessToken = authService.generateAccessToken(user);
-        const refreshToken = authService.generateRefreshToken(user);
-
         // Return token to the client
         res.status(200).json({
             success: true,
@@ -26,24 +22,11 @@ class UserController {
         });
     }
 
-    // Get all users
-    async getAllUsers(req, res, next) {
-        try {
-            const users = await userService.getAllUsers();
-            res.status(200).json({
-                success: true,
-                message: "Users fetched successfully",
-                data: users
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
 
     // Get user by ID
-    async getUserById(req, res, next) {
+    async getUser(req, res, next) {
         try {
-            const userId = req.params.userId;
+            const userId = req.user.user_id;
             const user = await userService.getUserById(userId);
             res.status(200).json({
                 success: true,

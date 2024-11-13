@@ -38,7 +38,7 @@ class UserRepository {
         }
     }
 
-    async addUser(userId, username, email, phone) {
+    async addUser(userId, username, email, phone, role) {
         const userData = {
             uid: userId,
             name: username,
@@ -54,33 +54,40 @@ class UserRepository {
             points: 0,
             province: "",
             rfid: "",
+            role: role,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };
 
         const ref = db.ref(`users/${userId}`);
-        await ref.set(userData);
+        const result = await ref.set(userData); 
+        return result 
+         
     }
 
 
     async updateUser(userId, userData) {
         const ref = db.ref(`users/${userId}`);
-        await ref.update(userData);
+        const result = await ref.update(userData);
+        return result 
     }
 
     async updatePoints(userId, updatedTotalPoints) {
         const ref = db.ref(`users/${userId}`);
-        await ref.update({ points: updatedTotalPoints });
+        const result = await ref.update({ points: updatedTotalPoints });
+        return result
     }
     async updateBottle(userId, botolTerkumpul) {
         const ref = db.ref(`users/${userId}`);
-        await ref.update({ botolTerkumpul: botolTerkumpul });
+        const result = await ref.update({ botolTerkumpul: botolTerkumpul });
+        return result
     }
 
 
     async deleteUser(userId) {
         const ref = db.ref(`users/${userId}`);
-        await ref.remove();
+        const result = await ref.remove();
+        return result
     }
 }
 

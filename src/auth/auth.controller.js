@@ -1,18 +1,15 @@
 import authService from './auth.service.js';
 
 class AuthController {
-    // Register a new user
-    async register(req, res, next) {
+    async register(req, res) {
 
         try {
-            const { user, accessToken, refreshToken } = await authService.registerUser(req);
+            const user = await authService.registerUser(req);
 
             res.status(201).json({
                 success: true,
                 message: 'User registered successfully',
-                user,
-                accessToken,
-                refreshToken
+                data: user
             });
         } catch (error) {
             res.status(400).json({
@@ -22,25 +19,16 @@ class AuthController {
         }
     }
 
-    // Login a user
-    async login(req, res, next) {
-        const { email, password } = req.body;
-
+    async login(req, res) {
         try {
-            const { user, accessToken, refreshToken } = await authService.loginUser(email, password);
-
-            const firebaseAccessToken = user.stsTokenManager.accessToken;
-            const firebaserefreshToken = user.stsTokenManager.refreshToken;
-
-            res.status(200).json({
-                success: true,
-                statusCode: 200,
-                message: 'Login successful',
-                user,
-                // firebaseAccessToken,
-                // firebaserefreshToken,
-                // accessToken,
-                // refreshToken
+            const result = await authService.loginUser(req);
+            if (result instanceof Error) {
+                return res.status(400).json({ status: 400, message: result.message });
+            }
+            return res.status(200).json({
+                status: 200,
+                message: "Login Success",
+                data: result
             });
         } catch (error) {
             console.error('Login Error:', error);
@@ -52,10 +40,13 @@ class AuthController {
     }
 
     // Logout a user
-    async logout(req, res, next) {
+    async logout(req, res) {
         try {
-            await authService.logoutUser();
+            const result = await authService.logoutUser();
 
+            if (result instanceof Error) {
+                return res.status(401).json({ status: 401, message: result.message });
+            }
             res.status(200).json({
                 success: true,
                 message: 'Logout successful',

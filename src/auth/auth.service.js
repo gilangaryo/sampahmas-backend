@@ -20,32 +20,37 @@ class AuthService {
 
             const user = await authRepository.register(createUserRequest.email, createUserRequest.password, createUserRequest.username, createUserRequest.phone);
 
-            // Generate JWT tokens
-            const accessToken = this.generateAccessToken(user);
-            const refreshToken = this.generateRefreshToken(user);
-
-            return { user, accessToken, refreshToken };
+            if (!user) {
+                throw new Error('User registration failed.');
+            }
+            
+            return user ;
         } catch (error) {
             throw new Error(error.message);
         }
     }
 
     // Login user
-    async loginUser(email, password) {
+    async loginUser(req) {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return new Error("Email and password are required");
+        }
         const user = await authRepository.login(email, password);
 
-        // Generate JWT tokens
-        const accessToken = this.generateAccessToken(user);
-        const refreshToken = this.generateRefreshToken(user);
+        if(!user){
+            throw new Error('Invalid user');
+        }
 
-        return { user, accessToken, refreshToken };
+        return user;
     }
 
     // Logout user
     async logoutUser() {
         try {
-            await authRepository.logout();  // Call the repository’s logout method
-            return true;
+            const result = await authRepository.logout();  
+            return result;
         } catch (error) {
             console.error('Error logging out user:', error);
             throw new Error(error.message);

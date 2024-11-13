@@ -33,7 +33,6 @@ app.use(cors());
 app.use('/api/auth', authRoutes);
 app.use('/api/user', usersRoutes);
 app.use('/api/item', itemsRoutes);
-app.use('/api/point', pointRoutes);
 app.use('/api/vending', vendingRoutes);
 app.use('/api/transaction', payRoutes);
 
@@ -48,7 +47,6 @@ app.get('/', (req, res) => {
 app.post('/api/endpoint', (req, res) => {
     const { message } = req.body;
     console.log(`Received message from Python API: ${message}`);
-
     res.status(200).json({ success: true });
 });
 
