@@ -1,5 +1,5 @@
 import userRepository from '../users/users.repository.js';
-
+import mqttClient from '../mqtt/mqttClient.js';
 export async function handleRFIDAuthentication(deviceId, data) {
     try {
         const RFID = data.rfidTag;
