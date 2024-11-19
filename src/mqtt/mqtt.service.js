@@ -60,10 +60,10 @@ export async function handleMQTTMessage(topic, message) {
                 }
                 break;
 
-            case 'reset':
-                publishResetCommand(deviceId);
-                console.log(`Handled reset command for device ${deviceId}`);
-                break;
+            // case 'reset':
+            //     // publishResetCommand(deviceId);
+            //     console.log(`Handled reset command for device ${deviceId}`);
+            //     break;
 
             default:
                 console.warn("Unknown action:", action);

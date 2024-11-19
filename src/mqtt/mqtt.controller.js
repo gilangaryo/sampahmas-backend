@@ -2,19 +2,17 @@ import mqttClient from './mqttClient.js';
 import { handleMQTTMessage } from './mqtt.service.js';
 
 export const clientSubscriptions = {};
+const topics = ['vending/+/auth', 'vending/+/point', 'vending/+/reset'];
 
 export function setupMQTT() {
-    const topic = 'vending/+/auth';
-    const pointTopic = 'vending/+/point';
-    const mqttTopicReset = 'vending/+/reset';
     const qos = 2;
 
-    mqttClient.subscribe([topic, pointTopic, mqttTopicReset], { qos }, (error) => {
+    mqttClient.subscribe(topics, { qos }, (error) => {
         if (error) {
-            console.log('subscribe error:', error);
-            return;
+            console.log('Subscribe error:', error);
+        } else {
+            console.log(`Subscribed to topics: ${topics.join(', ')}`);
         }
-        console.log(`Subscribed to topics '${topic}', '${pointTopic}', and '${mqttTopicReset}'`);
     });
 
     mqttClient.on('message', (receivedTopic, message) => {
