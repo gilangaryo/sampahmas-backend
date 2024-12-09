@@ -11,8 +11,8 @@ router.use(authMiddleware);
 // router.get('/email', verifyUserOrAdmin, userController.getUserByEmail); // Accessible by user or admin
 // router.get('/rfid/:rfidTag', verifyUserOrAdmin, userController.getUserByRFID); // Accessible by user or admin
 
-router.get('/', authMiddleware, userController.getUser); 
-router.put('/:userId', authMiddleware, userController.updateUser); 
-router.delete('/:userId', authMiddleware, userController.deleteUser);
+router.get('/',  userController.getUser); 
+router.put('/:userId',  userController.updateUser); 
+router.delete('/:userId',  userController.deleteUser);
 
 export default router;

@@ -13,6 +13,8 @@ export async function handleQRCodeAuthentication(deviceId, data) {
                 status: true,
                 accessToken: accessToken,
                 idUser: user.uid,
+                email: user.email,
+                phone: user.phone,
                 name: user.name,
                 points: user.points
             };

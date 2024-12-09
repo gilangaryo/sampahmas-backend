@@ -1,6 +1,18 @@
-import { clientSubscriptions } from '../mqtt/mqtt.controller.js';
-import {  publishResetCommand } from '../helper/iotHandler.js';
 import { handleQRCodeAuthentication, updatePointUser } from './websocket.service.js';
+
+export const clientSubscriptions = {};
+
+export async function publishResetCommand(deviceId) {
+    const resetTopic = `vending/${deviceId}/reset`;
+
+    mqttClient.publish(resetTopic, JSON.stringify({ message: 'reset' }), { qos: 2 }, (err) => {
+        if (err) {
+            console.error('Failed to publish reset command to MQTT:', err);
+        } else {
+            console.log(`Published reset command to MQTT topic '${resetTopic}'`);
+        }
+    });
+}
 
 export function handleWebSocketConnection(ws) {
     ws.on('message', async (message) => {

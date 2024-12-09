@@ -1,7 +1,6 @@
 import mqttClient from './mqttClient.js';
 import { handleMQTTMessage } from './mqtt.service.js';
 
-export const clientSubscriptions = {};
 const topics = ['vending/+/auth', 'vending/+/point', 'vending/+/reset'];
 
 export function setupMQTT() {

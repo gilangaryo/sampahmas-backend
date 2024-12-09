@@ -1,6 +1,39 @@
 import mqttClient from './mqttClient.js';
-import { handleRFIDAuthentication, handlePointData, publishResetCommand } from '../helper/iotHandler.js';
-import { clientSubscriptions } from './mqtt.controller.js';
+import userRepository from '../users/users.repository.js';
+export const clientSubscriptions = {};
+
+export async function handleRFIDAuthentication(deviceId, data) {
+    try {
+        const RFID = data.rfidTag;
+        const user = await userRepository.getUserByRFID(RFID);
+
+        if (user) {
+            const accessToken = 'ABCDEFG';
+            return {
+                deviceId: deviceId,
+                result: 'Authorized',
+                status: true,
+                accessToken: accessToken,
+                idUser: user.uid,
+                name: user.name,
+                points: user.points
+            };
+        } else {
+            return {
+                result: 'Not Authorized',
+                status: false
+            };
+        }
+    } catch (error) {
+        console.error('Error handling RFID authentication:', error);
+        return {
+            result: 'Error',
+            status: false
+        };
+    }
+}
+
+
 
 export async function handleMQTTMessage(topic, message) {
     const payloadString = message.toString();
@@ -60,10 +93,6 @@ export async function handleMQTTMessage(topic, message) {
                 }
                 break;
 
-            // case 'reset':
-            //     // publishResetCommand(deviceId);
-            //     console.log(`Handled reset command for device ${deviceId}`);
-            //     break;
 
             default:
                 console.warn("Unknown action:", action);

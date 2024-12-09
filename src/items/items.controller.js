@@ -2,7 +2,6 @@ import itemService from './items.service.js';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 class ItemController {
-    // Create a new item
     async createItem(req, res, next) {
         try {
             const { date, description, image, official, price, title } = req.body;
@@ -20,7 +19,6 @@ class ItemController {
         }
     }
 
-    // Get all items
     async getAllItems(req, res, next) {
         try {
             const items = await itemService.getAllItems();
@@ -34,7 +32,6 @@ class ItemController {
         }
     }
 
-    // Get an item by ID
     async getItemById(req, res, next) {
         try {
             const { itemId } = req.params;
@@ -58,7 +55,6 @@ class ItemController {
         }
     }
 
-    // Update an existing item
     async updateItem(req, res, next) {
         try {
             const { itemId } = req.params;
@@ -75,7 +71,6 @@ class ItemController {
         }
     }
 
-    // Delete an item by ID
     async deleteItem(req, res, next) {
         try {
             const { itemId } = req.params;
