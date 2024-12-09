@@ -30,4 +30,4 @@ const ErrorHandler = (err, req, res, next) => {
     res.status(statusCode).json(errorResponse);
 };
 
-export { CustomError, ErrorHandler };
+export default ErrorHandler;
