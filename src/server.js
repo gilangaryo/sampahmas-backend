@@ -3,7 +3,7 @@ import http from 'http';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import ErrorHandler  from './middleware/ErrorHandler.js';
+// import ErrorHandler  from './middleware/ErrorHandler.js';
 import VendingMachineSystem from './iot/index.js';
 
 import usersRoutes from './routes/users.route.js';
@@ -55,7 +55,7 @@ class AppServer {
             });
         });
 
-        this.app.use(ErrorHandler);
+        // this.app.use(ErrorHandler);
     }
 
     setupVendingSystem() {
